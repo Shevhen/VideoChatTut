@@ -1,0 +1,1 @@
+sudo nano asset-manifest.json && sudo nano favicon.ico && sudo nano index.html && sudo nano logo192.png && sudo nano logo512.png && sudo nano manifest.json && sudo nano robots.txt

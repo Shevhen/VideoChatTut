@@ -1,8 +1,16 @@
-import Button from "@material-ui/core/Button"
-import IconButton from "@material-ui/core/IconButton"
-import TextField from "@material-ui/core/TextField"
-import AssignmentIcon from "@material-ui/icons/Assignment"
-import PhoneIcon from "@material-ui/icons/Phone"
+// const App = () => {
+// 	return(
+// 		<div>
+// 			Hello!!
+// 		</div>
+// 	)
+// }
+// export default App
+// import Button from "@material-ui/core/Button"
+// import IconButton from "@material-ui/core/IconButton"
+// import TextField from "@material-ui/core/TextField"
+// import AssignmentIcon from "@material-ui/icons/Assignment"
+// import PhoneIcon from "@material-ui/icons/Phone"
 import React, { useEffect, useRef, useState } from "react"
 import { CopyToClipboard } from "react-copy-to-clipboard"
 import Peer from "simple-peer"
@@ -10,8 +18,11 @@ import io from "socket.io-client"
 import "./App.css"
 
 
-const socket = io.connect('http://localhost:5000')
-function App() {
+const socket = io.connect('http://66.248.207.87:8000')
+
+// ('http://localhost:5000')
+
+const App = () => {
 	const [ me, setMe ] = useState("")
 	const [ stream, setStream ] = useState()
 	const [ receivingCall, setReceivingCall ] = useState(false)
@@ -23,13 +34,18 @@ function App() {
 	const [ name, setName ] = useState("")
 	const myVideo = useRef()
 	const userVideo = useRef()
-	const connectionRef= useRef()
+	const connectionRef = useRef()
 
 	useEffect(() => {
-		navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
-			setStream(stream)
-				myVideo.current.srcObject = stream
-		})
+		try{
+			navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+						setStream(stream)
+						myVideo.current.srcObject = stream
+					})
+		}catch(e){
+			console.log(e)
+		}
+		
 
 	socket.on("me", (id) => {
 			setMe(id)
@@ -108,37 +124,50 @@ function App() {
 				</div>
 			</div>
 			<div className="myId">
-				<TextField
+				
+				{/* <TextField
 					id="filled-basic"
 					label="Name"
 					variant="filled"
 					value={name}
 					onChange={(e) => setName(e.target.value)}
 					style={{ marginBottom: "20px" }}
-				/>
+				/> */}
 				<CopyToClipboard text={me} style={{ marginBottom: "2rem" }}>
-					<Button variant="contained" color="primary" startIcon={<AssignmentIcon fontSize="large" />}>
+					<button>
+						Copy
+					</button>
+					{/* <Button variant="contained" color="primary">
 						Copy ID
-					</Button>
+					</Button> */}
 				</CopyToClipboard>
+				<input id="filled-basic"
+					label="ID to call"
+					value={idToCall} onChange={(e) => setIdToCall(e.target.value)}>
 
-				<TextField
+				</input>
+				{/* <TextField
 					id="filled-basic"
 					label="ID to call"
 					variant="filled"
 					value={idToCall}
 					onChange={(e) => setIdToCall(e.target.value)}
-				/>
+				/> */}
 				<div className="call-button">
 					{callAccepted && !callEnded ? (
-						<Button variant="contained" color="secondary" onClick={leaveCall}>
+						<button onClick={leaveCall}>
 							End Call
-						</Button>
-					) : (
-						<IconButton color="primary" aria-label="call" onClick={() => callUser(idToCall)}>
-							<PhoneIcon fontSize="large" />
-						</IconButton>
-					)}
+						</button>
+						// <Button variant="contained" color="secondary" onClick={leaveCall}>
+						// 	End Call
+						// </Button>
+					) : <button onClick={() => callUser(idToCall)}> go go</button>
+					// (
+					// 	<IconButton color="primary" aria-label="call" onClick={() => callUser(idToCall)}>
+					// 		<PhoneIcon fontSize="large" />
+					// 	</IconButton>
+					// )
+					}
 					{idToCall}
 				</div>
 			</div>
@@ -146,9 +175,12 @@ function App() {
 				{receivingCall && !callAccepted ? (
 						<div className="caller">
 						<h1 >{name} is calling...</h1>
-						<Button variant="contained" color="primary" onClick={answerCall}>
+						<button onClick={answerCall}>
 							Answer
-						</Button>
+						</button>
+						{/* <Button variant="contained" color="primary" onClick={answerCall}>
+							Answer
+						</Button> */}
 					</div>
 				) : null}
 			</div>
