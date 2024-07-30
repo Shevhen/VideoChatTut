@@ -18,9 +18,9 @@ import io from "socket.io-client"
 import "./App.css"
 
 
-const socket = io.connect('http://66.248.207.87:8000')
+const socket = io.connect('http://localhost:8000')
 
-// ('http://localhost:5000')
+// ('http://66.248.207.87:8000')
 
 const App = () => {
 	const [ me, setMe ] = useState("")
@@ -35,16 +35,14 @@ const App = () => {
 	const myVideo = useRef()
 	const userVideo = useRef()
 	const connectionRef = useRef()
+	// const navigator = new Navigator()
 
-	useEffect(() => {
-		try{
-			navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
-						setStream(stream)
-						myVideo.current.srcObject = stream
-					})
-		}catch(e){
-			console.log(e)
-		}
+	useEffect(  () => {
+		navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+		setStream(stream)
+		if(myVideo.current){
+		myVideo.current.srcObject = stream}
+	})
 		
 
 	socket.on("me", (id) => {
@@ -59,7 +57,7 @@ const App = () => {
 		})
 	}, [])
 
-	const callUser = (id) => {
+	const callUser = async (id) => {
 		const peer = new Peer({
 			initiator: true,
 			trickle: false,
@@ -73,9 +71,9 @@ const App = () => {
 				name: name
 			})
 		})
-		peer.on("stream", (stream) => {
-			
-				userVideo.current.srcObject = stream
+		await peer.on("stream", (stream) => {
+			if(userVideo.current.srcObject !== undefined){
+				userVideo.current.srcObject = stream}
 			
 		})
 		socket.on("callAccepted", (signal) => {
@@ -86,7 +84,7 @@ const App = () => {
 		connectionRef.current = peer
 	}
 
-	const answerCall =() =>  {
+	const answerCall = async () =>  {
 		setCallAccepted(true)
 		const peer = new Peer({
 			initiator: false,
@@ -96,8 +94,9 @@ const App = () => {
 		peer.on("signal", (data) => {
 			socket.emit("answerCall", { signal: data, to: caller })
 		})
-		peer.on("stream", (stream) => {
-			userVideo.current.srcObject = stream
+		await peer.on("stream", (stream) => {
+			if(userVideo.current.srcObject!== undefined){
+			userVideo.current.srcObject = stream}
 		})
 
 		peer.signal(callerSignal)
