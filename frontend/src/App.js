@@ -18,7 +18,7 @@ import io from "socket.io-client"
 import "./App.css"
 
 
-const socket = io.connect('http://localhost:8000'|| 'http://66.248.207.87:8000')
+const socket = io.connect('http://66.248.207.87:8000')
 
 // ('http://66.248.207.87:8000')
 
