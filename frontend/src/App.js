@@ -18,8 +18,7 @@ import io from "socket.io-client"
 import "./App.css"
 
 
-const socket = io.connect('https://kvitkovyjdim.com.ua/')
-
+// const socket = io.connect('https://learnwithme.top/api')
 // ('http://66.248.207.87:8000')
 
 const App = () => {
@@ -35,7 +34,6 @@ const App = () => {
 	const myVideo = useRef()
 	const userVideo = useRef()
 	const connectionRef = useRef()
-	// const navigator = new Navigator()
 
 	useEffect(  () => {
 		navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
@@ -45,146 +43,152 @@ const App = () => {
 	})
 		
 
-	socket.on("me", (id) => {
-			setMe(id)
-		})
+	// socket.on("me", (id) => {
+	// 		setMe(id)
+	// 	})
 
-		socket.on("callUser", (data) => {
-			setReceivingCall(true)
-			setCaller(data.from)
-			setName(data.name)
-			setCallerSignal(data.signal)
-		})
+	// 	socket.on("callUser", (data) => {
+	// 		setReceivingCall(true)
+	// 		setCaller(data.from)
+	// 		setName(data.name)
+	// 		setCallerSignal(data.signal)
+	// 	})
 	}, [])
 
-	const callUser = async (id) => {
-		const peer = new Peer({
-			initiator: true,
-			trickle: false,
-			stream: stream
-		})
-		peer.on("signal", (data) => {
-			socket.emit("callUser", {
-				userToCall: id,
-				signalData: data,
-				from: me,
-				name: name
-			})
-		})
-		await peer.on("stream", (stream) => {
-			if(userVideo.current.srcObject !== undefined){
-				userVideo.current.srcObject = stream}
+	// const callUser = async (id) => {
+	// 	const peer = new Peer({
+	// 		initiator: true,
+	// 		trickle: false,
+	// 		stream: stream
+	// 	})
+	// 	peer.on("signal", (data) => {
+	// 		socket.emit("callUser", {
+	// 			userToCall: id,
+	// 			signalData: data,
+	// 			from: me,
+	// 			name: name
+	// 		})
+	// 	})
+	// 	await peer.on("stream", (stream) => {
+	// 		if(userVideo.current.srcObject !== undefined){
+	// 			userVideo.current.srcObject = stream}
 			
-		})
-		socket.on("callAccepted", (signal) => {
-			setCallAccepted(true)
-			peer.signal(signal)
-		})
+	// 	})
+	// 	socket.on("callAccepted", (signal) => {
+	// 		setCallAccepted(true)
+	// 		peer.signal(signal)
+	// 	})
 
-		connectionRef.current = peer
-	}
+	// 	connectionRef.current = peer
+	// }
 
-	const answerCall = async () =>  {
-		setCallAccepted(true)
-		const peer = new Peer({
-			initiator: false,
-			trickle: false,
-			stream: stream
-		})
-		peer.on("signal", (data) => {
-			socket.emit("answerCall", { signal: data, to: caller })
-		})
-		await peer.on("stream", (stream) => {
-			if(userVideo.current.srcObject!== undefined){
-			userVideo.current.srcObject = stream}
-		})
+	// const answerCall = async () =>  {
+	// 	setCallAccepted(true)
+	// 	const peer = new Peer({
+	// 		initiator: false,
+	// 		trickle: false,
+	// 		stream: stream
+	// 	})
+	// 	peer.on("signal", (data) => {
+	// 		socket.emit("answerCall", { signal: data, to: caller })
+	// 	})
+	// 	await peer.on("stream", (stream) => {
+	// 		if(userVideo.current.srcObject!== undefined){
+	// 		userVideo.current.srcObject = stream}
+	// 	})
 
-		peer.signal(callerSignal)
-		connectionRef.current = peer
-	}
+	// 	peer.signal(callerSignal)
+	// 	connectionRef.current = peer
+	// }
 
-	const leaveCall = () => {
-		setCallEnded(true)
-		connectionRef.current.destroy()
-	}
+	// const leaveCall = () => {
+	// 	setCallEnded(true)
+	// 	connectionRef.current.destroy()
+	// }
 
 	return (
-		<>
-			<h1 style={{ textAlign: "center", color: '#fff' }}>Zoomish</h1>
-		<div className="container">
-			<div className="video-container">
-				<div className="video">
+		<div className="video">
 					{stream &&  <video playsInline muted ref={myVideo} autoPlay style={{ width: "300px" }} />}
 				</div>
-				<div className="video">
-					{callAccepted && !callEnded ?
-					<video playsInline ref={userVideo} autoPlay style={{ width: "300px"}} />:
-					null}
-				</div>
-			</div>
-			<div className="myId">
-				
-				{/* <TextField
-					id="filled-basic"
-					label="Name"
-					variant="filled"
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-					style={{ marginBottom: "20px" }}
-				/> */}
-				<CopyToClipboard text={me} style={{ marginBottom: "2rem" }}>
-					<button>
-						Copy
-					</button>
-					{/* <Button variant="contained" color="primary">
-						Copy ID
-					</Button> */}
-				</CopyToClipboard>
-				<input id="filled-basic"
-					label="ID to call"
-					value={idToCall} onChange={(e) => setIdToCall(e.target.value)}>
 
-				</input>
-				{/* <TextField
-					id="filled-basic"
-					label="ID to call"
-					variant="filled"
-					value={idToCall}
-					onChange={(e) => setIdToCall(e.target.value)}
-				/> */}
-				<div className="call-button">
-					{callAccepted && !callEnded ? (
-						<button onClick={leaveCall}>
-							End Call
-						</button>
-						// <Button variant="contained" color="secondary" onClick={leaveCall}>
-						// 	End Call
-						// </Button>
-					) : <button onClick={() => callUser(idToCall)}> go go</button>
-					// (
-					// 	<IconButton color="primary" aria-label="call" onClick={() => callUser(idToCall)}>
-					// 		<PhoneIcon fontSize="large" />
-					// 	</IconButton>
-					// )
-					}
-					{idToCall}
-				</div>
-			</div>
-			<div>
-				{receivingCall && !callAccepted ? (
-						<div className="caller">
-						<h1 >{name} is calling...</h1>
-						<button onClick={answerCall}>
-							Answer
-						</button>
-						{/* <Button variant="contained" color="primary" onClick={answerCall}>
-							Answer
-						</Button> */}
-					</div>
-				) : null}
-			</div>
-		</div>
-		</>
+
+
+		// <>
+		// 	<h1 style={{ textAlign: "center", color: '#fff' }}>Zoomish</h1>
+		// <div className="container">
+		// 	<div className="video-container">
+		// 		<div className="video">
+		// 			{stream &&  <video playsInline muted ref={myVideo} autoPlay style={{ width: "300px" }} />}
+		// 		</div>
+		// 		<div className="video">
+		// 			{callAccepted && !callEnded ?
+		// 			<video playsInline ref={userVideo} autoPlay style={{ width: "300px"}} />:
+		// 			null}
+		// 		</div>
+		// 	</div>
+		// 	<div className="myId">
+				
+		// 		{/* <TextField
+		// 			id="filled-basic"
+		// 			label="Name"
+		// 			variant="filled"
+		// 			value={name}
+		// 			onChange={(e) => setName(e.target.value)}
+		// 			style={{ marginBottom: "20px" }}
+		// 		/> */}
+		// 		<CopyToClipboard text={me} style={{ marginBottom: "2rem" }}>
+		// 			<button>
+		// 				Copy
+		// 			</button>
+		// 			{/* <Button variant="contained" color="primary">
+		// 				Copy ID
+		// 			</Button> */}
+		// 		</CopyToClipboard>
+		// 		<input id="filled-basic"
+		// 			label="ID to call"
+		// 			value={idToCall} onChange={(e) => setIdToCall(e.target.value)}>
+
+		// 		</input>
+		// 		{/* <TextField
+		// 			id="filled-basic"
+		// 			label="ID to call"
+		// 			variant="filled"
+		// 			value={idToCall}
+		// 			onChange={(e) => setIdToCall(e.target.value)}
+		// 		/> */}
+		// 		<div className="call-button">
+		// 			{callAccepted && !callEnded ? (
+		// 				<button onClick={leaveCall}>
+		// 					End Call
+		// 				</button>
+		// 				// <Button variant="contained" color="secondary" onClick={leaveCall}>
+		// 				// 	End Call
+		// 				// </Button>
+		// 			) : <button onClick={() => callUser(idToCall)}> go go</button>
+		// 			// (
+		// 			// 	<IconButton color="primary" aria-label="call" onClick={() => callUser(idToCall)}>
+		// 			// 		<PhoneIcon fontSize="large" />
+		// 			// 	</IconButton>
+		// 			// )
+		// 			}
+		// 			{idToCall}
+		// 		</div>
+		// 	</div>
+		// 	<div>
+		// 		{receivingCall && !callAccepted ? (
+		// 				<div className="caller">
+		// 				<h1 >{name} is calling...</h1>
+		// 				<button onClick={answerCall}>
+		// 					Answer
+		// 				</button>
+		// 				{/* <Button variant="contained" color="primary" onClick={answerCall}>
+		// 					Answer
+		// 				</Button> */}
+		// 			</div>
+		// 		) : null}
+		// 	</div>
+		// </div>
+		// </>
 	)
 }
 
